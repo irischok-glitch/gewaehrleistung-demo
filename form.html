@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Gewährleistungsantrag | ALZURA AG</title>
+<style>
+  :root {
+    --primary: #1a365d;
+    --accent: #2b6cb0;
+    --light: #ebf8ff;
+    --border: #cbd5e0;
+    --success: #276749;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', system-ui, Arial, sans-serif;
+    background: #f7fafc;
+    margin: 0;
+    color: #1a202c;
+    line-height: 1.5;
+  }
+  .header {
+    background: var(--primary);
+    color: white;
+    padding: 20px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .header h1 { margin: 0; font-size: 22px; }
+  .container { max-width: 900px; margin: 30px auto; padding: 0 20px; }
+  .card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    padding: 28px;
+    margin-bottom: 24px;
+  }
+  h2 { color: var(--primary); margin-top: 0; font-size: 20px; }
+  h3 { color: var(--accent); font-size: 16px; margin: 24px 0 12px; }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .full { grid-column: 1 / -1; }
+  label { display: block; font-weight: 600; margin-bottom: 4px; font-size: 14px; }
+  label .req { color: #e53e3e; }
+  input, select, textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 14px;
+  }
+  textarea { min-height: 80px; resize: vertical; }
+  .section { border-top: 1px solid var(--border); padding-top: 20px; margin-top: 20px; }
+  .notice {
+    background: #fffaf0;
+    border-left: 4px solid #c05621;
+    padding: 14px 16px;
+    margin: 16px 0;
+    font-size: 14px;
+    border-radius: 0 6px 6px 0;
+  }
+  .checkbox-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin: 12px 0;
+  }
+  .checkbox-row input { width: auto; margin-top: 3px; }
+  .upload-area {
+    border: 2px dashed var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    background: #fafafa;
+    margin: 10px 0;
+  }
+  .upload-area.disabled { opacity: 0.5; pointer-events: none; }
+  button, .btn {
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-size: 15px;
+    cursor: pointer;
+    font-weight: 600;
+  }
+  button:disabled { background: #a0aec0; cursor: not-allowed; }
+  .btn-secondary { background: #4a5568; }
+  .hidden { display: none; }
+  .footer { text-align: center; padding: 20px; color: #718096; font-size: 13px; }
+  .radio-group label { font-weight: normal; display: flex; align-items: center; gap: 6px; margin: 6px 0; }
+  .radio-group input { width: auto; }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>ALZURA AG – Gewährleistungsantrag</h1>
+  <span>B2B Plattform</span>
+</div>
+
+<div class="container">
+  <form id="claimForm" action="/submit" method="POST" enctype="multipart/form-data">
+    <div class="card">
+      <h2>Gewährleistungsantrag</h2>
+      <p>Bitte füllen Sie alle Felder vollständig aus. Unvollständige Angaben können zu Verzögerungen führen.</p>
+
+      <h3>Daten Antragsteller</h3>
+      <div class="form-grid">
+        <div><label>E-Mail-Adresse <span class="req">*</span></label><input type="email" name="email" required></div>
+        <div><label>Kundennummer <span class="req">*</span></label><input type="text" name="kundennummer" required></div>
+        <div class="full"><label>Firmenname <span class="req">*</span></label><input type="text" name="firmenname" required></div>
+        <div><label>Straße, Haus-Nr. <span class="req">*</span></label><input type="text" name="strasse" required></div>
+        <div><label>PLZ, Ort <span class="req">*</span></label><input type="text" name="plz_ort" required></div>
+        <div><label>Telefon <span class="req">*</span></label><input type="tel" name="telefon" required></div>
+        <div><label>Ansprechpartner bei Rückfragen <span class="req">*</span></label><input type="text" name="ansprechpartner" required></div>
+      </div>
+
+      <h3>Auftragsdaten</h3>
+      <div class="form-grid">
+        <div><label>Auftragsnummer (Bestellnummer) <span class="req">*</span></label><input type="text" name="auftragsnummer" id="auftragsnummer" required></div>
+        <div><label>Rechnungsnummer <span class="req">*</span></label><input type="text" name="rechnungsnummer" required></div>
+        <div class="full"><label>Beschreiben Sie den Fehler/Defekt ausführlich <span class="req">*</span> (mindestens 80 Zeichen)</label><textarea name="fehlerbeschreibung" required minlength="80"></textarea></div>
+        <div><label>Anzahl der Artikel <span class="req">*</span></label><input type="number" name="anzahl" min="1" required></div>
+        <div><label>Bezeichnung des Artikels <span class="req">*</span></label><input type="text" name="artikelbezeichnung" required></div>
+        <div class="full"><label>Hersteller-Artikel Nummer (nicht ALZURA ID!) <span class="req">*</span></label><input type="text" name="hersteller_artikelnummer" required></div>
+      </div>
+
+      <h3>Fahrzeugdaten</h3>
+      <div class="form-grid">
+        <div><label>Fahrzeughersteller und Modell <span class="req">*</span></label><input type="text" name="fahrzeug" required></div>
+        <div><label>Schlüssel-Nr./KBA-Nr. zu 2 (2.1) <span class="req">*</span></label><input type="text" name="kba_21" required></div>
+        <div><label>Schlüssel-Nr./KBA-Nr. zu 3 (2.2) <span class="req">*</span></label><input type="text" name="kba_22" required></div>
+        <div><label>Fahrgestell-Nr. <span class="req">*</span></label><input type="text" name="fahrgestell" required></div>
+        <div><label>Motor-Typ <span class="req">*</span></label><input type="text" name="motor_typ" required></div>
+        <div><label>Hubraum <span class="req">*</span></label><input type="text" name="hubraum" required></div>
+        <div><label>KW/PS <span class="req">*</span></label><input type="text" name="kw_ps" required></div>
+        <div><label>Erstzulassung <span class="req">*</span></label><input type="date" name="erstzulassung" required></div>
+        <div><label>Einbau am <span class="req">*</span></label><input type="date" name="einbau_am" required></div>
+        <div><label>km Stand beim Einbau <span class="req">*</span></label><input type="number" name="km_einbau" required></div>
+        <div><label>Ausbau am <span class="req">*</span></label><input type="date" name="ausbau_am" required></div>
+        <div><label>km Stand beim Ausbau <span class="req">*</span></label><input type="number" name="km_ausbau" required></div>
+      </div>
+
+      <div class="form-grid" style="margin-top: 16px;">
+        <div>
+          <label>Kraftstofftyp des Fahrzeugs <span class="req">*</span></label>
+          <div class="radio-group">
+            <label><input type="radio" name="kraftstoff" value="Benzin" required> Benzin</label>
+            <label><input type="radio" name="kraftstoff" value="Diesel"> Diesel</label>
+            <label><input type="radio" name="kraftstoff" value="Sonstiges"> Sonstiges</label>
+          </div>
+        </div>
+        <div>
+          <label>Getriebeart <span class="req">*</span></label>
+          <div class="radio-group">
+            <label><input type="radio" name="getriebe" value="Schaltung" required> Schaltung</label>
+            <label><input type="radio" name="getriebe" value="Automatik"> Automatik</label>
+            <label><input type="radio" name="getriebe" value="Sonstiges"> Sonstiges</label>
+          </div>
+        </div>
+        <div class="full">
+          <label>Fehler tritt auf <span class="req">*</span></label>
+          <div class="radio-group">
+            <label><input type="checkbox" name="fehler_warm" value="ja"> im warmen Zustand</label>
+            <label><input type="checkbox" name="fehler_kalt" value="ja"> im kalten Zustand</label>
+            <label><input type="checkbox" name="fehler_feucht" value="ja"> bei Feuchtigkeit</label>
+            <label><input type="checkbox" name="fehler_sonstiges" value="ja"> Sonstiges: <input type="text" name="fehler_sonstiges_text" style="width: 200px; display: inline-block; margin-left: 6px;"></label>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h3>Lohn-/Nebenkosten</h3>
+        <label>Lohn-/Nebenkosten werden beantragt? <span class="req">*</span></label>
+        <div class="radio-group">
+          <label><input type="radio" name="lohnkosten" value="ja" id="lohn_ja" required> Ja</label>
+          <label><input type="radio" name="lohnkosten" value="nein" id="lohn_nein"> Nein</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dokumente -->
+    <div class="card">
+      <h2>Erforderliche Dokumente</h2>
+
+      <!-- Ersteinbaurechnung -->
+      <h3>1. Ersteinbaurechnung (Pflicht)</h3>
+      <div class="notice" id="notice_rechnung">
+        <strong>Bestätigung erforderlich</strong><br>
+        Ich bestätige, dass es sich bei der hochgeladenen Rechnung um die Ersteinbaurechnung des beanstandeten Artikels aus der Auftragsnummer <strong id="dyn_auftrag">[Auftragsnummer]</strong> handelt und dass die Artikelnummer auf der Rechnung enthalten ist.
+      </div>
+      <div class="checkbox-row">
+        <input type="checkbox" id="confirm_rechnung" required>
+        <label for="confirm_rechnung">Ich bestätige die obige Aussage.</label>
+      </div>
+      <div class="upload-area" id="upload_rechnung">
+        <label>Ersteinbaurechnung hochladen (PDF, max. 1 MB)</label>
+        <input type="file" name="ersteinbau" accept=".pdf" required>
+      </div>
+
+      <!-- Kostenaufstellung -->
+      <div id="kosten_section" class="hidden">
+        <h3>2. Kostenaufstellung</h3>
+        <div class="notice">
+          <strong>Hinweis zur Kostenaufstellung</strong><br>
+          Damit wir die geltend gemachten Kosten prüfen können, müssen folgende Angaben eindeutig enthalten sein:<br>
+          • Die genaue Artikelnummer<br>
+          • Die einzelnen Arbeitsschritte, die in den Arbeitswerten (AW) enthalten sind (z. B. reiner Aus- und Einbau, Fehlersuche usw.). Eine pauschale Angabe „aus- und eingebaut“ reicht nicht aus.<br><br>
+          Falls Folgeschäden oder zusätzliche Materialien aufgeführt sind, müssen die entsprechenden Bezugsrechnungen mit eingereicht werden. Ohne diese können die Materialkosten nicht übernommen werden.
+        </div>
+        <div class="checkbox-row">
+          <input type="checkbox" id="confirm_kosten">
+          <label for="confirm_kosten">Ich bestätige, dass ich diesen Hinweis vollständig gelesen und verstanden habe.</label>
+        </div>
+        <p><a href="#" id="download_template" class="btn btn-secondary" style="display:inline-block; text-decoration:none; pointer-events:none; opacity:0.5;">Vorlage Kostenaufstellung herunterladen</a></p>
+        <div class="upload-area disabled" id="upload_kosten">
+          <label>Kostenaufstellung hochladen (PDF)</label>
+          <input type="file" name="kostenaufstellung" accept=".pdf" disabled>
+        </div>
+      </div>
+
+      <!-- Diagnoseprotokoll -->
+      <h3>3. Diagnoseprotokoll</h3>
+      <div class="radio-group">
+        <label><input type="radio" name="diagnose_option" value="upload" id="diag_upload"> Ich lade das Diagnoseprotokoll hoch</label>
+        <label><input type="radio" name="diagnose_option" value="mechanisch" id="diag_mech"> Kein Diagnoseprotokoll, weil mechanischer Fehler</label>
+      </div>
+      <div id="diag_confirm_box" class="hidden">
+        <div class="checkbox-row">
+          <input type="checkbox" id="confirm_mech">
+          <label for="confirm_mech">Ich bestätige, dass es sich um einen mechanischen Fehler handelt, der nicht über ein Auslesegerät auslesbar ist.</label>
+        </div>
+      </div>
+      <div class="upload-area disabled" id="upload_diagnose">
+        <label>Diagnoseprotokoll hochladen (PDF)</label>
+        <input type="file" name="diagnose" accept=".pdf" disabled>
+      </div>
+
+      <!-- Fotos -->
+      <h3>4. Fotos (optional, max. 3)</h3>
+      <p>Haben Sie noch Fotos, die Sie hochladen möchten?</p>
+      <div class="upload-area">
+        <label>Foto 1 (JPG, max. 700 KB)</label>
+        <input type="file" name="foto1" accept=".jpg,.jpeg,.png">
+      </div>
+      <div class="upload-area">
+        <label>Foto 2</label>
+        <input type="file" name="foto2" accept=".jpg,.jpeg,.png">
+      </div>
+      <div class="upload-area">
+        <label>Foto 3</label>
+        <input type="file" name="foto3" accept=".jpg,.jpeg,.png">
+      </div>
+    </div>
+
+    <!-- Hinweis technische Begutachtung -->
+    <div class="card">
+      <h3>Hinweis zur technischen Begutachtung und Rücksendung</h3>
+      <div class="notice">
+        Der Kunde nimmt zur Kenntnis und stimmt ausdrücklich zu, dass das zur Prüfung bzw. technischen Begutachtung eingesandte Gerät im Rahmen der Fehleranalyse und Diagnose geöffnet, zerlegt und/oder in seine Einzelteile zerlegt werden kann.<br><br>
+        Der Kunde erklärt sich damit einverstanden, dass das Gerät nach Abschluss der technischen Begutachtung gegebenenfalls in zerlegtem bzw. nicht vollständig montiertem Zustand zurückgesendet werden kann, sofern eine vollständige Wiederherstellung bzw. Montage für die Durchführung der technischen Prüfung nicht erforderlich oder wirtschaftlich nicht sinnvoll ist.<br><br>
+        Mit der Einsendung des Gerätes bestätigt der Kunde, diesen Hinweis gelesen und zur Kenntnis genommen zu haben.
+      </div>
+      <div class="checkbox-row">
+        <input type="checkbox" name="hinweis_kenntnis" required>
+        <label>ZUR KENNTNIS GENOMMEN <span class="req">*</span></label>
+      </div>
+    </div>
+
+    <div style="text-align: center; margin: 30px 0;">
+      <button type="submit" id="submitBtn">Antrag absenden</button>
+    </div>
+  </form>
+</div>
+
+<div class="footer">
+  ALZURA AG | Gewährleistungsantrag | Prototyp
+</div>
+
+<script>
+const auftragInput = document.getElementById('auftragsnummer');
+const dynAuftrag = document.getElementById('dyn_auftrag');
+auftragInput.addEventListener('input', () => {
+  dynAuftrag.textContent = auftragInput.value || '[Auftragsnummer]';
+});
+
+// Lohnkosten toggle
+document.getElementById('lohn_ja').addEventListener('change', toggleKosten);
+document.getElementById('lohn_nein').addEventListener('change', toggleKosten);
+function toggleKosten() {
+  const section = document.getElementById('kosten_section');
+  if (document.getElementById('lohn_ja').checked) {
+    section.classList.remove('hidden');
+  } else {
+    section.classList.add('hidden');
+  }
+}
+
+// Kostenaufstellung confirmation
+document.getElementById('confirm_kosten').addEventListener('change', function() {
+  const upload = document.getElementById('upload_kosten');
+  const input = upload.querySelector('input');
+  const dl = document.getElementById('download_template');
+  if (this.checked) {
+    upload.classList.remove('disabled');
+    input.disabled = false;
+    dl.style.pointerEvents = 'auto';
+    dl.style.opacity = '1';
+  } else {
+    upload.classList.add('disabled');
+    input.disabled = true;
+    dl.style.pointerEvents = 'none';
+    dl.style.opacity = '0.5';
+  }
+});
+
+// Diagnose options
+document.getElementById('diag_upload').addEventListener('change', handleDiag);
+document.getElementById('diag_mech').addEventListener('change', handleDiag);
+function handleDiag() {
+  const uploadArea = document.getElementById('upload_diagnose');
+  const input = uploadArea.querySelector('input');
+  const confirmBox = document.getElementById('diag_confirm_box');
+  if (document.getElementById('diag_upload').checked) {
+    uploadArea.classList.remove('disabled');
+    input.disabled = false;
+    confirmBox.classList.add('hidden');
+  } else if (document.getElementById('diag_mech').checked) {
+    uploadArea.classList.add('disabled');
+    input.disabled = true;
+    confirmBox.classList.remove('hidden');
+  }
+}
+
+// Simple client-side validation hint
+document.getElementById('claimForm').addEventListener('submit', function(e) {
+  const lohnJa = document.getElementById('lohn_ja').checked;
+  if (lohnJa && !document.getElementById('confirm_kosten').checked) {
+    alert('Bitte bestätigen Sie den Hinweis zur Kostenaufstellung.');
+    e.preventDefault();
+    return;
+  }
+  if (document.getElementById('diag_mech').checked && !document.getElementById('confirm_mech').checked) {
+    alert('Bitte bestätigen Sie den Hinweis zum mechanischen Fehler.');
+    e.preventDefault();
+    return;
+  }
+});
+</script>
+</body>
+</html>

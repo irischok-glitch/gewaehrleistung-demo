@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Gewährleistungsantrag ALZURA – Vollständige Testversion</title>
+<style>
+  :root { --primary: #1a365d; --accent: #2b6cb0; --border: #cbd5e0; }
+  * { box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f7fafc; margin: 0; color: #1a202c; }
+  .header { background: var(--primary); color: white; padding: 16px 30px; display: flex; justify-content: space-between; align-items: center; }
+  .nav a { color: white; margin-left: 18px; text-decoration: none; font-weight: 500; }
+  .nav a.active { border-bottom: 2px solid white; }
+  .container { max-width: 960px; margin: 30px auto; padding: 0 20px; }
+  .card { background: white; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); padding: 24px; margin-bottom: 20px; }
+  h2 { color: var(--primary); margin-top: 0; }
+  h3 { color: var(--accent); }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .full { grid-column: 1 / -1; }
+  label { display: block; font-weight: 600; margin-bottom: 4px; font-size: 14px; }
+  label .req { color: #e53e3e; }
+  input, select, textarea { width: 100%; padding: 9px 12px; border: 1px solid var(--border); border-radius: 6px; }
+  .notice { background: #fffaf0; border-left: 4px solid #c05621; padding: 14px 16px; margin: 14px 0; font-size: 14px; }
+  .checkbox-row { display: flex; align-items: flex-start; gap: 10px; margin: 10px 0; }
+  .checkbox-row input { width: auto; }
+  .upload-area { border: 2px dashed var(--border); border-radius: 8px; padding: 16px; text-align: center; background: #fafafa; margin: 10px 0; }
+  .disabled { opacity: 0.45; pointer-events: none; }
+  button, .btn { background: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 600; }
+  .btn-secondary { background: #4a5568; }
+  .hidden { display: none; }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+  th { background: var(--primary); color: white; }
+  .status { padding: 3px 9px; border-radius: 12px; font-size: 12px; font-weight: 600; background: #ebf8ff; color: #2b6cb0; }
+  .chat { background: #fafafa; border-radius: 8px; padding: 12px; max-height: 280px; overflow-y: auto; margin-bottom: 12px; }
+  .msg { margin-bottom: 8px; padding: 8px 12px; border-radius: 6px; }
+  .msg.mitarbeiter { background: #ebf8ff; }
+  .internal { background: #fffaf0; border-left: 3px solid #c05621; padding: 8px; margin: 6px 0; font-size: 13px; }
+  .grid2 { display: grid; grid-template-columns: 1fr 320px; gap: 20px; }
+  .error { color: #c53030; font-size: 13px; margin-top: 4px; }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1 style="margin:0; font-size:18px;">ALZURA AG – Gewährleistungsantrag (Volltest)</h1>
+  <div class="nav">
+    <a href="#" onclick="showPage('form'); return false;" id="nav-form" class="active">Formular</a>
+    <a href="#" onclick="showPage('backoffice'); return false;" id="nav-bo">Backoffice</a>
+  </div>
+</div>
+
+<div id="page-form" class="container">
+  <form id="claimForm" onsubmit="return handleSubmit(event)">
+    <div class="card">
+      <h2>Gewährleistungsantrag</h2>
+      <div class="form-grid">
+        <div><label>E-Mail-Adresse <span class="req">*</span></label><input type="email" name="email" required></div>
+        <div><label>Kundennummer <span class="req">*</span></label><input type="text" name="kundennummer" required></div>
+        <div class="full"><label>Firmenname <span class="req">*</span></label><input type="text" name="firmenname" required></div>
+        <div><label>Auftragsnummer <span class="req">*</span></label><input type="text" name="auftragsnummer" id="auftragsnummer" required></div>
+        <div><label>Artikelbezeichnung <span class="req">*</span></label><input type="text" name="artikelbezeichnung" required></div>
+        <div class="full">
+          <label>Fehlerbeschreibung <span class="req">*</span> (min. 130 Zeichen)</label>
+          <textarea name="fehlerbeschreibung" id="fehlerbeschreibung" required minlength="130"></textarea>
+          <div id="fehler-count" class="error"></div>
+        </div>
+      </div>
+      <h3>Lohn-/Nebenkosten</h3>
+      <label><input type="radio" name="lohnkosten" value="ja" id="lohn_ja" required> Ja</label>
+      <label><input type="radio" name="lohnkosten" value="nein" id="lohn_nein"> Nein</label>
+    </div>
+
+    <div class="card">
+      <h2>Erforderliche Dokumente</h2>
+      <h3>1. Ersteinbaurechnung (Pflicht)</h3>
+      <div class="notice">Ich bestätige, dass es sich um die Ersteinbaurechnung aus der Auftragsnummer <strong id="dyn_auftrag">[Auftragsnummer]</strong> handelt und die Artikelnummer enthalten ist.</div>
+      <div class="checkbox-row"><input type="checkbox" id="confirm_rechnung" required><label>Ich bestätige die Aussage.</label></div>
+      <div class="upload-area disabled" id="upload_rechnung"><input type="file" accept=".pdf" id="file_rechnung" disabled></div>
+
+      <div id="kosten_section" class="disabled">
+        <h3>2. Kostenaufstellung</h3>
+        <div class="notice">
+          <strong>Hinweis zur Kostenaufstellung</strong><br>
+          Damit wir die Kosten prüfen können, müssen enthalten sein: die genaue Artikelnummer und die konkreten Arbeitsschritte in den AW (nicht nur „aus- und eingebaut“). Bei Folgeschäden/Materialien bitte Bezugsrechnungen beilegen.
+        </div>
+        <div class="checkbox-row"><input type="checkbox" id="confirm_kosten"><label>Hinweis gelesen und verstanden.</label></div>
+        <p><button type="button" id="download_template" class="btn btn-secondary" disabled onclick="alert('In der echten Version würde hier die PDF-Vorlage heruntergeladen werden.')">Vorlage Kostenaufstellung herunterladen</button></p>
+        <div class="upload-area disabled" id="upload_kosten"><input type="file" accept=".pdf" id="file_kosten" disabled></div>
+      </div>
+
+      <h3>3. Diagnoseprotokoll</h3>
+      <label><input type="radio" name="diagnose_option" value="upload" id="diag_upload"> Hochladen</label>
+      <label><input type="radio" name="diagnose_option" value="mechanisch" id="diag_mech"> Mechanischer Fehler</label>
+      <div id="diag_confirm_box" class="hidden">
+        <div class="checkbox-row"><input type="checkbox" id="confirm_mech"><label>Ich bestätige mechanischen Fehler (nicht auslesbar).</label></div>
+      </div>
+      <div class="upload-area disabled" id="upload_diagnose"><input type="file" accept=".pdf" id="file_diagnose" disabled></div>
+    </div>
+
+    <div style="text-align:center; margin:20px 0;"><button type="submit">Antrag absenden</button></div>
+  </form>
+</div>
+
+<div id="page-backoffice" class="container hidden">
+  <div class="card">
+    <h2>Backoffice – Alle Anträge</h2>
+    <div id="claims-list"></div>
+  </div>
+  <div id="detail-view" class="hidden">
+    <div class="grid2">
+      <div>
+        <div class="card"><h3>Antragsdaten</h3><div id="detail-data"></div></div>
+        <div class="card">
+          <h3>Chat / Ticket</h3>
+          <div id="chat-box" class="chat"></div>
+          <textarea id="chat-input" placeholder="Antwort an den Kunden..." rows="3"></textarea>
+          <button onclick="sendChat()" style="margin-top:8px;">Antwort senden</button>
+        </div>
+      </div>
+      <div>
+        <div class="card">
+          <h3>Status ändern</h3>
+          <select id="status-select"></select>
+          <input type="text" id="tracking" placeholder="Sendungsnummer (optional)" style="margin-top:8px;">
+          <textarea id="internal-comment" placeholder="Interner Kommentar" rows="3" style="margin-top:8px;"></textarea>
+          <button onclick="saveStatus()" style="margin-top:8px;">Speichern</button>
+        </div>
+        <div class="card"><h3>Interne Kommentare</h3><div id="comments-box"></div></div>
+      </div>
+    </div>
+    <p><a href="#" onclick="showList(); return false;">← Zurück zur Übersicht</a></p>
+  </div>
+</div>
+
+<script>
+const STATUSES = ["Eingegangen","In Prüfung","Unterlagen unvollständig","Artikel abholen","Artikel eingegangen","An Hersteller weitergeschickt","Beim Hersteller","Ausgezahlt","Abgelehnt"];
+let claims = [];
+let currentId = null;
+
+// Safe storage (works even if localStorage is blocked)
+function saveClaims() { try { localStorage.setItem('claims', JSON.stringify(claims)); } catch(e) {} }
+function loadClaims() { try { claims = JSON.parse(localStorage.getItem('claims') || '[]'); } catch(e) { claims = []; } }
+loadClaims();
+
+document.getElementById('auftragsnummer').addEventListener('input', e => {
+  document.getElementById('dyn_auftrag').textContent = e.target.value || '[Auftragsnummer]';
+});
+
+document.getElementById('fehlerbeschreibung').addEventListener('input', function() {
+  const len = this.value.length;
+  document.getElementById('fehler-count').textContent = len < 130 ? `Noch ${130 - len} Zeichen erforderlich` : '';
+});
+
+document.getElementById('confirm_rechnung').addEventListener('change', function() {
+  const area = document.getElementById('upload_rechnung');
+  area.classList.toggle('disabled', !this.checked);
+  document.getElementById('file_rechnung').disabled = !this.checked;
+});
+
+function updateKosten() {
+  const section = document.getElementById('kosten_section');
+  const isJa = document.getElementById('lohn_ja').checked;
+  section.classList.toggle('disabled', !isJa);
+  document.getElementById('confirm_kosten').disabled = !isJa;
+  document.getElementById('download_template').disabled = !isJa;
+  document.getElementById('file_kosten').disabled = !isJa;
+  if (!isJa) {
+    document.getElementById('confirm_kosten').checked = false;
+    document.getElementById('upload_kosten').classList.add('disabled');
+  }
+}
+document.getElementById('lohn_ja').addEventListener('change', updateKosten);
+document.getElementById('lohn_nein').addEventListener('change', updateKosten);
+updateKosten();
+
+document.getElementById('confirm_kosten').addEventListener('change', function() {
+  const enabled = this.checked;
+  document.getElementById('upload_kosten').classList.toggle('disabled', !enabled);
+  document.getElementById('file_kosten').disabled = !enabled;
+  document.getElementById('download_template').disabled = !enabled;
+});
+
+function handleDiag() {
+  const area = document.getElementById('upload_diagnose');
+  const box = document.getElementById('diag_confirm_box');
+  if (document.getElementById('diag_upload').checked) {
+    area.classList.remove('disabled');
+    document.getElementById('file_diagnose').disabled = false;
+    box.classList.add('hidden');
+  } else if (document.getElementById('diag_mech').checked) {
+    area.classList.add('disabled');
+    document.getElementById('file_diagnose').disabled = true;
+    box.classList.remove('hidden');
+  }
+}
+document.getElementById('diag_upload').addEventListener('change', handleDiag);
+document.getElementById('diag_mech').addEventListener('change', handleDiag);
+
+function handleSubmit(e) {
+  e.preventDefault();
+  const form = document.getElementById('claimForm');
+  if (!form.checkValidity()) {
+    form.reportValidity();
+    return false;
+  }
+  const data = Object.fromEntries(new FormData(form));
+  data.id = 'A' + Math.floor(Math.random()*9000+1000);
+  data.created = new Date().toLocaleString('de-DE');
+  data.status = 'Eingegangen';
+  data.chat = [];
+  data.comments = [];
+  data.tracking = '';
+  claims.push(data);
+  saveClaims();
+  alert('Antrag übermittelt!\nAntragsnummer: ' + data.id + '\n\nSie haben alle erforderlichen Schritte erledigt.');
+  form.reset();
+  updateKosten();
+  showPage('backoffice');
+  return false;
+}
+
+function showPage(page) {
+  document.getElementById('page-form').classList.toggle('hidden', page !== 'form');
+  document.getElementById('page-backoffice').classList.toggle('hidden', page !== 'backoffice');
+  document.getElementById('nav-form').classList.toggle('active', page === 'form');
+  document.getElementById('nav-bo').classList.toggle('active', page === 'backoffice');
+  if (page === 'backoffice') showList();
+}
+
+function showList() {
+  document.getElementById('detail-view').classList.add('hidden');
+  document.getElementById('claims-list').classList.remove('hidden');
+  const el = document.getElementById('claims-list');
+  if (!claims.length) { el.innerHTML = '<p>Noch keine Anträge.</p>'; return; }
+  el.innerHTML = '<table><tr><th>ID</th><th>Firma</th><th>Auftrag</th><th>Status</th><th></th></tr>' +
+    claims.map(c => `<tr><td>${c.id}</td><td>${c.firmenname||''}</td><td>${c.auftragsnummer||''}</td><td><span class="status">${c.status}</span></td><td><a href="#" onclick="openClaim('${c.id}'); return false;">Öffnen</a></td></tr>`).join('') + '</table>';
+}
+
+function openClaim(id) {
+  currentId = id;
+  const c = claims.find(x => x.id === id);
+  if (!c) return;
+  document.getElementById('claims-list').classList.add('hidden');
+  document.getElementById('detail-view').classList.remove('hidden');
+  document.getElementById('detail-data').innerHTML = `
+    <p><strong>ID:</strong> ${c.id}</p>
+    <p><strong>Firma:</strong> ${c.firmenname||''}</p>
+    <p><strong>Kundennummer:</strong> ${c.kundennummer||''}</p>
+    <p><strong>Auftrag:</strong> ${c.auftragsnummer||''}</p>
+    <p><strong>Artikel:</strong> ${c.artikelbezeichnung||''}</p>
+    <p><strong>Fehler:</strong> ${c.fehlerbeschreibung||''}</p>
+    <p><strong>Lohnkosten:</strong> ${c.lohnkosten||''}</p>
+    <p><strong>Status:</strong> ${c.status}</p>
+  `;
+  const sel = document.getElementById('status-select');
+  sel.innerHTML = STATUSES.map(s => `<option ${s===c.status?'selected':''}>${s}</option>`).join('');
+  document.getElementById('tracking').value = c.tracking || '';
+  renderChat(c);
+  renderComments(c);
+}
+
+function renderChat(c) {
+  const box = document.getElementById('chat-box');
+  box.innerHTML = (c.chat||[]).map(m => `<div class="msg mitarbeiter"><strong>${m.sender}</strong> <small>${m.time}</small><br>${m.text}</div>`).join('') || '<p>Noch keine Nachrichten.</p>';
+}
+function renderComments(c) {
+  document.getElementById('comments-box').innerHTML = (c.comments||[]).map(cm => `<div class="internal"><small>${cm.time}</small><br>${cm.text}</div>`).join('') || '<p>Keine internen Kommentare.</p>';
+}
+function sendChat() {
+  const text = document.getElementById('chat-input').value.trim();
+  if (!text || !currentId) return;
+  const c = claims.find(x => x.id === currentId);
+  c.chat = c.chat || [];
+  c.chat.push({ time: new Date().toLocaleString('de-DE'), sender: 'Mitarbeiter', text });
+  saveClaims();
+  document.getElementById('chat-input').value = '';
+  renderChat(c);
+}
+function saveStatus() {
+  if (!currentId) return;
+  const c = claims.find(x => x.id === currentId);
+  c.status = document.getElementById('status-select').value;
+  c.tracking = document.getElementById('tracking').value;
+  const comment = document.getElementById('internal-comment').value.trim();
+  if (comment) {
+    c.comments = c.comments || [];
+    c.comments.push({ time: new Date().toLocaleString('de-DE'), text: comment });
+    document.getElementById('internal-comment').value = '';
+  }
+  saveClaims();
+  openClaim(currentId);
+  alert('Status gespeichert.');
+}
+</script>
+</body>
+</html>
