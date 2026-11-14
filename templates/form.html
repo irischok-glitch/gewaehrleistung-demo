@@ -120,7 +120,11 @@
       <div class="form-grid">
         <div><label>Auftragsnummer (Bestellnummer) <span class="req">*</span></label><input type="text" name="auftragsnummer" id="auftragsnummer" required></div>
         <div><label>Rechnungsnummer <span class="req">*</span></label><input type="text" name="rechnungsnummer" required></div>
-        <div class="full"><label>Beschreiben Sie den Fehler/Defekt ausführlich <span class="req">*</span> (mindestens 80 Zeichen)</label><textarea name="fehlerbeschreibung" required minlength="80"></textarea></div>
+        <div class="full">
+          <label>Beschreiben Sie den Fehler/Defekt ausführlich <span class="req">*</span> (mindestens 80 Zeichen)</label>
+          <textarea name="fehlerbeschreibung" id="fehlerbeschreibung" required minlength="80"></textarea>
+          <div id="fehler-count" style="font-size:13px; color:#718096; margin-top:4px;">0 / 80 Zeichen</div>
+        </div>
         <div><label>Anzahl der Artikel <span class="req">*</span></label><input type="number" name="anzahl" min="1" required></div>
         <div><label>Bezeichnung des Artikels <span class="req">*</span></label><input type="text" name="artikelbezeichnung" required></div>
         <div class="full"><label>Hersteller-Artikel Nummer (nicht ALZURA ID!) <span class="req">*</span></label><input type="text" name="hersteller_artikelnummer" required></div>
@@ -284,6 +288,17 @@ const dynAuftrag = document.getElementById('dyn_auftrag');
 auftragInput.addEventListener('input', () => {
   dynAuftrag.textContent = auftragInput.value || '[Auftragsnummer]';
 });
+
+// Zeichenzähler für Fehlerbeschreibung
+const fehlerInput = document.getElementById('fehlerbeschreibung');
+const fehlerCount = document.getElementById('fehler-count');
+if (fehlerInput && fehlerCount) {
+  fehlerInput.addEventListener('input', function() {
+    const len = this.value.length;
+    fehlerCount.textContent = len + ' / 80 Zeichen';
+    fehlerCount.style.color = len >= 80 ? '#276749' : '#c53030';
+  });
+}
 
 // Lohnkosten toggle
 document.getElementById('lohn_ja').addEventListener('change', toggleKosten);
