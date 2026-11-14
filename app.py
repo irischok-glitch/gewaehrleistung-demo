@@ -41,14 +41,15 @@ def send_email(to_email, subject, body):
         msg['Subject'] = subject
         msg.attach(MIMEText(body, 'plain', 'utf-8'))
         
-        with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
-            server.starttls()
-            server.login(SMTP_USER, SMTP_PASSWORD)
-            server.send_message(msg)
+        server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT, timeout=10)
+        server.starttls()
+        server.login(SMTP_USER, SMTP_PASSWORD)
+        server.send_message(msg)
+        server.quit()
         print(f"[E-Mail gesendet] An: {to_email}")
         return True
     except Exception as e:
-        print(f"[E-Mail Fehler] {e}")
+        print(f"[E-Mail Fehler] {type(e).__name__}: {e}")
         return False
 
 def load_claims():
@@ -145,11 +146,12 @@ def submit():
     claims.append(claim)
     save_claims(claims)
     
-    # Bestätigungs-E-Mail an den Kunden
-    customer_email = request.form.get('email', '')
-    if customer_email:
-        subject = f"Gewährleistungsantrag eingegangen – {auftragsnummer}"
-        body = f"""Guten Tag,
+    # Bestätigungs-E-Mail an den Kunden (darf den Antrag nicht blockieren)
+    try:
+        customer_email = request.form.get('email', '')
+        if customer_email:
+            subject = f"Gewährleistungsantrag eingegangen – {auftragsnummer}"
+            body = f"""Guten Tag,
 
 Ihr Gewährleistungsantrag wurde erfolgreich übermittelt.
 
@@ -162,7 +164,9 @@ Wir prüfen Ihren Antrag und melden uns bei Ihnen, sobald es Neuigkeiten gibt.
 Mit freundlichen Grüßen
 ALZURA AG – Gewährleistung
 """
-        send_email(customer_email, subject, body)
+            send_email(customer_email, subject, body)
+    except Exception as e:
+        print(f"[E-Mail Block Fehler] {e}")
     
     return redirect(url_for('success', claim_id=claim_id))
 
