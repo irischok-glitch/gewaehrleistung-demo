@@ -17,7 +17,7 @@ app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024  # 5 MB
 # E-Mail Konfiguration (über Umgebungsvariablen)
 SMTP_SERVER = os.environ.get('SMTP_SERVER', 'smtp.office365.com')
 SMTP_PORT = int(os.environ.get('SMTP_PORT', 587))
-SMTP_USER = os.environ.get('SMTP_USER', 'irina.wuckert@alzura.com')
+SMTP_USER = os.environ.get('SMTP_USER', 'irinawuckert@outlook.de')
 SMTP_PASSWORD = os.environ.get('SMTP_PASSWORD', '')
 FROM_EMAIL = os.environ.get('FROM_EMAIL', 'irina.wuckert@alzura.com')
 
